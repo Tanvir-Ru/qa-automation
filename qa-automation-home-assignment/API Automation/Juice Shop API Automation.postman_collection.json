@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "121912e4-0bdb-477f-9fc3-32e167160dc5",
+		"name": "Juice Shop API Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "17949252"
+	},
+	"item": [
+		{
+			"name": "(Scenario 1) Sign in",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"authToken\", jsonData.authentication.token);\r",
+							"pm.environment.set(\"basketId\", jsonData.authentication.bid);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"iamtester.cse@gmail.com\",\r\n    \"password\": \"u0yC&sJBEBN4\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/rest/user/login"
+			},
+			"response": []
+		},
+		{
+			"name": "(Scenario 1) Add 1 Item to the Basket",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ProductId\": 1,\r\n    \"BasketId\": \"{{basketId}}\",\r\n    \"quantity\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/api/BasketItems/"
+			},
+			"response": []
+		},
+		{
+			"name": "(Scenario 1) Verify Basket Contains 1 Item",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Basket contains 1 item\", function () {\r",
+							"  pm.expect(jsonData.data.Products.length).to.eql(1);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": "{{base_url}}/rest/basket/{{basketId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "(Scenario 2) Add 2 Items to the Basket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"basketItemId2\", jsonData.data.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ProductId\": 2,\r\n    \"BasketId\": \"{{basketId}}\",\r\n    \"quantity\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/api/BasketItems/"
+			},
+			"response": []
+		},
+		{
+			"name": "(Scenario 2) Delete 1 Item from the Basket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Deleted item from basket\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": "{{base_url}}/api/BasketItems/{{basketItemId2}}"
+			},
+			"response": []
+		},
+		{
+			"name": "(Scenario 2) Verify Basket Contains 1 Item",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Basket contains 1 item\", function () {\r",
+							"  pm.expect(jsonData.data.Products.length).to.eql(1);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": "{{base_url}}/rest/basket/{{basketId}}"
+			},
+			"response": []
+		}
+	]
+}
